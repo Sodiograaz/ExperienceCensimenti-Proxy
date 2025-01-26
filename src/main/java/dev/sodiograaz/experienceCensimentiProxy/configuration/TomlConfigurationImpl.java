@@ -1,10 +1,12 @@
 package dev.sodiograaz.experienceCensimentiProxy.configuration;
 
 import com.fasterxml.jackson.dataformat.toml.TomlMapper;
+import com.velocitypowered.api.proxy.ProxyServer;
 import dev.sodiograaz.experienceCensimentiProxy.ExperienceCensimentiProxy;
 import dev.sodiograaz.experienceCensimentiProxy.configuration.data.ExpCensProxyConfig;
 import lombok.SneakyThrows;
 import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -16,9 +18,23 @@ import java.nio.file.Paths;
 */
 public class TomlConfigurationImpl implements TomlConfiguration {
 	
-	private File file;
+	// START BOILERPLATE
+	
+	private final ProxyServer proxyServer;
+	private final Logger logger;
+	private final Path configPath;
+	
+	public TomlConfigurationImpl(ProxyServer proxyServer, Logger logger, Path configPath) {
+		this.proxyServer = proxyServer;
+		this.logger = logger;
+		this.configPath = configPath;
+		this.file = new File(configPath.toFile(), "config.toml");
+	}
+	
+	// END BOILERPLATE
+	
+	private final File file;
 	private ExpCensProxyConfig config;
-	private final Path configPath = Paths.get(ExperienceCensimentiProxy.getExperienceCensimentiProxy().getDataFolder().getAbsolutePath(), "config.toml");
 	
 	@Override
 	public ExpCensProxyConfig getConfiguration() {
@@ -38,7 +54,6 @@ public class TomlConfigurationImpl implements TomlConfiguration {
 			copyFile();
 			return this;
 		}
-		file = new File(configPath.toUri());
 		file.createNewFile();
 		
 		try (InputStream isfr = this.getClass()
@@ -57,7 +72,7 @@ public class TomlConfigurationImpl implements TomlConfiguration {
 	@SneakyThrows
 	@Override
 	public TomlConfiguration copyFile() {
-		try(InputStream isfr = Files.newInputStream(configPath)) {
+		try(InputStream isfr = new FileInputStream(this.file)) {
 			this.config = new TomlMapper().readValue(isfr, ExpCensProxyConfig.class);
 		}
 		return this;

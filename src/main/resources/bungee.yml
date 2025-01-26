@@ -1,7 +1,0 @@
-name: ExperienceCensimenti-Proxy
-version: '1.0.0'
-main: dev.sodiograaz.experienceCensimentiProxy.ExperienceCensimentiProxy
-author: Sodiograaz
-depends:
-  - LastLoginAPI
-  - Parties

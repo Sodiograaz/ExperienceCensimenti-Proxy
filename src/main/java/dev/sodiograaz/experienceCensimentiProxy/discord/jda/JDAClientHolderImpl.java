@@ -2,6 +2,8 @@ package dev.sodiograaz.experienceCensimentiProxy.discord.jda;
 
 import com.github.ygimenez.method.Pages;
 import com.github.ygimenez.model.PaginatorBuilder;
+import com.google.inject.Inject;
+import com.velocitypowered.api.proxy.ProxyServer;
 import dev.sodiograaz.experienceCensimentiProxy.ExperienceCensimentiProxy;
 import dev.sodiograaz.experienceCensimentiProxy.discord.jda.api.JDAClientHolder;
 import dev.sodiograaz.experienceCensimentiProxy.discord.jda.api.commands.CommandInfo;
@@ -19,6 +21,7 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.Compression;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import net.dv8tion.jda.internal.interactions.CommandDataImpl;
+import org.slf4j.Logger;
 
 import java.util.stream.Collectors;
 
@@ -26,6 +29,18 @@ import java.util.stream.Collectors;
  @since 24/01/2025
 */
 public class JDAClientHolderImpl implements JDAClientHolder {
+	
+	// START BOILERPLATE
+	
+	private final ProxyServer proxyServer;
+	private final Logger logger;
+	
+	public JDAClientHolderImpl(ProxyServer proxyServer, Logger logger) {
+		this.proxyServer = proxyServer;
+		this.logger = logger;
+	}
+	
+	// END BOILERPLATE
 	
 	private JDA client;
 	private final String token = ExperienceCensimentiProxy.getExperienceCensimentiProxy()
@@ -58,12 +73,8 @@ public class JDAClientHolderImpl implements JDAClientHolder {
 		
 		if (guild != null) {
 			guild.loadMembers()
-					.onSuccess(x -> ExperienceCensimentiProxy.getExperienceCensimentiProxy()
-							.getLogger()
-							.info("Caricato tutti i membri discord: " + x.size() + "."))
-					.onError(x -> ExperienceCensimentiProxy.getExperienceCensimentiProxy()
-							.getLogger()
-							.info("Errore nel caricare tutti i membri discord.\n" + x.getLocalizedMessage()));
+					.onSuccess(x -> logger.info("Caricato tutti i membri discord: " + x.size() + "."))
+					.onError(x -> logger.error("Errore nel caricare tutti i membri discord.\n" + x.getLocalizedMessage()));
 		}
 		
 		guild.updateCommands()
