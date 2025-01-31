@@ -47,13 +47,14 @@ public class TomlConfigurationImpl implements TomlConfiguration {
 	@SneakyThrows
 	@Override
 	public TomlConfiguration saveFile() {
-		if(file != null && file.exists()) {
+		if(configPath.toFile() != null && configPath.toFile().exists() && file != null && file.exists()) {
 			ExperienceCensimentiProxy.getExperienceCensimentiProxy()
 					.getLogger()
 					.info("File di configurazione già esistente.");
 			copyFile();
 			return this;
 		}
+		configPath.toFile().mkdir();
 		file.createNewFile();
 		
 		try (InputStream isfr = this.getClass()
