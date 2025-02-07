@@ -10,12 +10,13 @@ import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
-import dev.sodiograaz.experienceCensimentiProxy.configuration.TomlConfiguration;
-import dev.sodiograaz.experienceCensimentiProxy.configuration.TomlConfigurationImpl;
+import dev.sodiograaz.experienceCensimentiProxy.configuration.GsonConfiguration;
+import dev.sodiograaz.experienceCensimentiProxy.configuration.GsonConfigurationImpl;
 import dev.sodiograaz.experienceCensimentiProxy.configuration.data.ExpCensProxyConfig;
 import dev.sodiograaz.experienceCensimentiProxy.discord.jda.JDAClientHolderImpl;
 import dev.sodiograaz.experienceCensimentiProxy.discord.jda.api.JDAClientHolder;
 import lombok.Getter;
+import lombok.SneakyThrows;
 import org.slf4j.Logger;
 
 import java.nio.file.Path;
@@ -34,7 +35,7 @@ public final class ExperienceCensimentiProxy {
 	// END BOILERPLATE
 	
 	private static @Getter ExperienceCensimentiProxy experienceCensimentiProxy;
-	private static TomlConfiguration tomlConfiguration;
+	private static GsonConfiguration gsonConfiguration;
 	private static @Getter ExpCensProxyConfig config;
 	
 	private static @Getter JDAClientHolder jdaClientHolder;
@@ -48,14 +49,16 @@ public final class ExperienceCensimentiProxy {
 		this.dataDirectory = dataDirectory;
 	}
 	
+	@SneakyThrows
 	@Subscribe
 	public void onProxyInitialization(ProxyInitializeEvent event) {
 		experienceCensimentiProxy = this;
-		tomlConfiguration = new TomlConfigurationImpl(proxyServer, logger, dataDirectory);
-		tomlConfiguration.saveFile();
-		config = tomlConfiguration.getConfiguration();
+		gsonConfiguration = new GsonConfigurationImpl(proxyServer, logger, dataDirectory);
+		gsonConfiguration.saveFile();
+		config = gsonConfiguration.getConfiguration();
 		
 		jdaClientHolder = new JDAClientHolderImpl(proxyServer, logger);
+		jdaClientHolder.createClient();
 	}
 	
 	private void setupLastLoginAPI() {

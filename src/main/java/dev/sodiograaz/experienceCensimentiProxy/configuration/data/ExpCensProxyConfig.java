@@ -1,6 +1,6 @@
 package dev.sodiograaz.experienceCensimentiProxy.configuration.data;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.gson.annotations.SerializedName;
 import lombok.Getter;
 
 /* @author Sodiograaz
@@ -9,9 +9,9 @@ import lombok.Getter;
 @Getter
 public class ExpCensProxyConfig {
 	
-	@JsonProperty("Bot-Token")
+	@SerializedName("Bot-Token")
 	String token;
-	@JsonProperty("Guild-ID")
+	@SerializedName("Guild-ID")
 	Long guildId;
 	
 }
