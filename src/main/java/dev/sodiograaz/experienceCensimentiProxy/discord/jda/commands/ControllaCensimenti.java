@@ -10,6 +10,7 @@ import com.github.ygimenez.model.Page;
 import dev.sodiograaz.experienceCensimentiProxy.ExperienceCensimentiProxy;
 import dev.sodiograaz.experienceCensimentiProxy.discord.jda.JDAUtils;
 import dev.sodiograaz.experienceCensimentiProxy.discord.jda.api.commands.CommandHandler;
+import dev.sodiograaz.experienceCensimentiProxy.discord.jda.api.commands.CommandInfo;
 import dev.sodiograaz.experienceCensimentiProxy.discord.jda.data.LastLoginPlayerPlayTime;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -25,6 +26,7 @@ import java.util.*;
 /* @author Sodiograaz
  @since 24/01/2025
 */
+@CommandInfo(name = "censimenti", usedOnlyBy = 660196082172559361L)
 public class ControllaCensimenti implements CommandHandler {
 	
 	private final PartiesAPI partiesAPI = ExperienceCensimentiProxy.getPartiesAPI();
@@ -46,7 +48,7 @@ public class ControllaCensimenti implements CommandHandler {
 		List<LastLoginPlayerPlayTime> lastLoginPlayerPlayTimeList = members.stream()
 				.map(uuid -> {
 					LastLoginPlayer player = lastLoginAPI.getPlayer(uuid);
-					return new LastLoginPlayerPlayTime(player.getName(), player.getLastLogin(), player.getLastLogout());
+					return new LastLoginPlayerPlayTime(player.getName(), (Long) player.getLastLogin(), (Long) player.getLastLogout());
 				})
 				.toList();
 		
@@ -71,7 +73,7 @@ public class ControllaCensimenti implements CommandHandler {
 			
 			// Crea l'embed per la pagina
 			MessageEmbed embed = JDAUtils.getGuildBasedEmbedForCommand(user)
-					.addField("Censimenti", String.format("```\n%s\n```", stringBuilder.toString()), false)
+					.addField("Censimenti", String.format("```\n%s\n```", stringBuilder), false)
 					.build();
 			embeds.add(embed);
 		}
@@ -100,8 +102,8 @@ public class ControllaCensimenti implements CommandHandler {
 		
 		long minutes = seconds / 60; // 1 minuto = 60 secondi
 		seconds %= 60;
-		
-		return String.format("%s giorni e %s ore e %s secondi", days, hours, minutes);
+
+		return String.format("%s giorni e %s ore e %s secondi", (Long) days, (Long) hours, (Long) minutes);
 	}
 	
 }
