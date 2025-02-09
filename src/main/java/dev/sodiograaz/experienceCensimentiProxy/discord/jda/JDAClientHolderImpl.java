@@ -18,6 +18,7 @@ import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import net.dv8tion.jda.api.utils.Compression;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import net.dv8tion.jda.internal.interactions.CommandDataImpl;
@@ -48,7 +49,7 @@ public class JDAClientHolderImpl implements JDAClientHolder {
 			.getToken();
 	
 	private static @Getter Guild guild;
-	private static final CommandManager commandManager = new CommandManager("dev.sodiograaz.experienceCensimenti.discord.jda.commands");
+	private static final CommandManager commandManager = new CommandManager("dev.sodiograaz.experienceCensimentiProxy.discord.jda.commands");
 	
 	@SneakyThrows
 	@Override
@@ -76,20 +77,22 @@ public class JDAClientHolderImpl implements JDAClientHolder {
 					.onSuccess(x -> logger.info("Caricato tutti i membri discord: " + x.size() + "."))
 					.onError(x -> logger.error("Errore nel caricare tutti i membri discord.\n" + x.getLocalizedMessage()));
 		}
-		
-		guild.updateCommands()
+
+		CommandListUpdateAction commands = guild.updateCommands()
 				.addCommands(commandManager.getCommandHandlerSet().stream()
 						.map(x -> {
 							CommandInfo commandInfo = null;
 							try {
 								commandInfo = x.getCommandInfo();
-							} catch (IllegalAccessException e) {}
+							} catch (IllegalAccessException e) {
+							}
 							return new CommandDataImpl(commandInfo.name(), commandInfo.description())
 									.addOptions(x.optionsData());
 						})
-						.collect(Collectors.toList()))
-				.queue();
-		
+						.collect(Collectors.toList()));
+
+		commands.queue((x) -> x.forEach(y -> System.out.printf("Added command %s to guild %s\n", y.getName(), guild.getId())));
+
 		return this;
 	}
 	
