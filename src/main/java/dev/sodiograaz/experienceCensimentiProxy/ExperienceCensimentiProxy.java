@@ -4,9 +4,12 @@ import com.alessiodp.lastloginapi.api.LastLogin;
 import com.alessiodp.lastloginapi.api.interfaces.LastLoginAPI;
 import com.alessiodp.parties.api.Parties;
 import com.alessiodp.parties.api.interfaces.PartiesAPI;
+import com.github.ygimenez.model.Paginator;
+import com.github.ygimenez.model.PaginatorBuilder;
 import com.google.inject.Inject;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
+import com.velocitypowered.api.plugin.Dependency;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
@@ -21,9 +24,15 @@ import org.slf4j.Logger;
 
 import java.nio.file.Path;
 
-@Plugin(id = "experiencecensimenti", name = "ExperienceCensimenti-Proxy",
-				version = "1.0.0a", description = "Utility per i censire villaggi/regni",
-				authors = {"Sodiograaz"})
+@Plugin(id = "experiencecensimenti",
+				name = "ExperienceCensimenti-Proxy",
+				version = "1.0.0a",
+				description = "Utility per i censire villaggi/regni",
+				authors = {"Sodiograaz"},
+				dependencies = {
+					@Dependency(id = "parties"),
+					@Dependency(id = "lastloginapi")
+				})
 public final class ExperienceCensimentiProxy {
 	
 	// START BOILERPLATE
@@ -39,9 +48,7 @@ public final class ExperienceCensimentiProxy {
 	private static @Getter ExpCensProxyConfig config;
 	
 	private static @Getter JDAClientHolder jdaClientHolder;
-	private static @Getter LastLoginAPI lastLoginAPI;
-	private static @Getter PartiesAPI partiesAPI;
-	
+
 	@Inject
 	public ExperienceCensimentiProxy(ProxyServer proxyServer, Logger logger, @DataDirectory Path dataDirectory) {
 		this.proxyServer = proxyServer;
@@ -56,26 +63,15 @@ public final class ExperienceCensimentiProxy {
 		gsonConfiguration = new GsonConfigurationImpl(proxyServer, logger, dataDirectory);
 		gsonConfiguration.saveFile();
 		config = gsonConfiguration.getConfiguration();
-		
+
 		jdaClientHolder = new JDAClientHolderImpl(proxyServer, logger);
 		jdaClientHolder.createClient();
+
+		PaginatorBuilder.createPaginator(jdaClientHolder.getClient())
+				.shouldEventLock(true)
+				.shouldRemoveOnReact(true)
+				.setDeleteOnCancel(true)
+				.activate();
 	}
 	
-	private void setupLastLoginAPI() {
-		if(this.proxyServer.getPluginManager().getPlugin("LastLoginAPI").isPresent()) {
-			if(this.proxyServer.getPluginManager().isLoaded("LastLoginAPI")) {
-				// LastLoginAPI is enabled
-				lastLoginAPI = LastLogin.getApi();
-			}
-		}
-	}
-	
-	private void setupPartiesAPI() {
-		if (this.proxyServer.getPluginManager().getPlugin("Parties").isPresent()) {
-			if(this.proxyServer.getPluginManager().isLoaded("Parties")) {
-				// Parties is enabled
-				partiesAPI = Parties.getApi();
-			}
-		}
-	}
 }

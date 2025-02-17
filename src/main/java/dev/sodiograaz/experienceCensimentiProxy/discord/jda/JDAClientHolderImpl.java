@@ -64,11 +64,7 @@ public class JDAClientHolderImpl implements JDAClientHolder {
 				.addEventListeners(commandManager)
 				.build()
 				.awaitReady();
-		
-		Pages.activate(PaginatorBuilder.createPaginator(client)
-				.shouldRemoveOnReact(false)
-				.shouldEventLock(true).build());
-		
+
 		guild = this.client.getGuildById(ExperienceCensimentiProxy.getConfig()
 				.getGuildId());
 		
@@ -81,13 +77,14 @@ public class JDAClientHolderImpl implements JDAClientHolder {
 		CommandListUpdateAction commands = guild.updateCommands()
 				.addCommands(commandManager.getCommandHandlerSet().stream()
 						.map(x -> {
-							CommandInfo commandInfo = null;
 							try {
-								commandInfo = x.getCommandInfo();
+								CommandInfo commandInfo = x.getCommandInfo();
+								return new CommandDataImpl(commandInfo.name(), commandInfo.description())
+										.addOptions(x.optionsData());
 							} catch (IllegalAccessException e) {
+								logger.error(e.getLocalizedMessage());
 							}
-							return new CommandDataImpl(commandInfo.name(), commandInfo.description())
-									.addOptions(x.optionsData());
+							return null;
 						})
 						.collect(Collectors.toList()));
 

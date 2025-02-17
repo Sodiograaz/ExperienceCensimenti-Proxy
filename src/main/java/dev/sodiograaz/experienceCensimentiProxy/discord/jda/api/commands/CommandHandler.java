@@ -19,15 +19,8 @@ public interface CommandHandler {
 	void executeCommand(SlashCommandInteractionEvent event, Member author, User user, User self, Guild guild);
 
 	List<OptionData> optionsData();
-	
-	default boolean checkIfCommandInfoIsDefined() {
-		return CommandHandler.class
-				.getAnnotation(CommandInfo.class) == null;
-	}
-	
+
 	default @Nullable CommandInfo getCommandInfo() throws IllegalAccessException {
-		if(checkIfCommandInfoIsDefined())
-			throw new IllegalAccessException("Un comando non è stato possibile registrarlo. mancano le istruzioni necessarie.");
 		return this.getClass()
 				.getAnnotation(CommandInfo.class);
 	}

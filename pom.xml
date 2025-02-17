@@ -133,7 +133,7 @@
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
-            <version>2.10.1</version> <!-- Sostituisci con la versione desiderata -->
+            <version>2.10.1</version>
         </dependency>
         <dependency>
             <groupId>com.github.ygimenez</groupId>
