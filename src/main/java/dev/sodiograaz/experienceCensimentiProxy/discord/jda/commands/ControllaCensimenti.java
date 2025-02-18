@@ -111,8 +111,8 @@ public class ControllaCensimenti implements CommandHandler {
 		Duration duration = Duration.between(logoutTimestamp, now);
 
 		long days = duration.toDays();
-		long hours = duration.toHours();
-		long minutes = duration.toMinutes();
+		long hours = duration.toHours() % 24;
+		long minutes = duration.toMinutes() % 60;
 
 		return String.format("%d giorni, %d ore, %d minuti", days, hours, minutes);
 	}
